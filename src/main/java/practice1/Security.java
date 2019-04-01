@@ -13,15 +13,7 @@ public class Security {
     public boolean hasAccess(User user, Permission permission, ImmutableList<Permission> permissions) {
 
         boolean isAccess = false;
-        if (user == null) {
-            return isAccess;
-        }
-
-        if (permission == null) {
-            return isAccess;
-        }
-
-        if (permissions.size() == 0) {
+        if ( userisNull(user) || permissionIsNull(permission) || permissionsSizeIsZero(permissions)){
             return isAccess;
         }
 
@@ -34,5 +26,17 @@ public class Security {
         }
 
         return isAccess;
+    }
+
+    private boolean permissionsSizeIsZero(ImmutableList<Permission> permissions) {
+        return permissions.size() == 0;
+    }
+
+    private boolean permissionIsNull(Permission permission) {
+        return permission == null;
+    }
+
+    private boolean userisNull(User user) {
+        return user == null;
     }
 }
