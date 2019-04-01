@@ -15,6 +15,14 @@ public class Receipt {
     public double CalculateGrandTotal(List<Product> products, List<OrderItem> items) {
         BigDecimal subTotal = calculateSubtotal(products, items);
 
+        subTotal = calculateAllProductsIncome(products, items, subTotal);
+        BigDecimal taxTotal = subTotal.multiply(tax);
+        BigDecimal grandTotal = subTotal.add(taxTotal);
+
+        return grandTotal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+
+    private BigDecimal calculateAllProductsIncome(List<Product> products, List<OrderItem> items, BigDecimal subTotal) {
         for (Product product : products) {
             OrderItem curItem = findOrderItemByProduct(items, product);
 
@@ -24,15 +32,17 @@ public class Receipt {
 
             subTotal = subTotal.subtract(reducedPrice);
         }
-        BigDecimal taxTotal = subTotal.multiply(tax);
-        BigDecimal grandTotal = subTotal.add(taxTotal);
-
-        return grandTotal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        return subTotal;
     }
 
 
     private OrderItem findOrderItemByProduct(List<OrderItem> items, Product product) {
         OrderItem curItem = null;
+        curItem = matchOrderItem(items, product, curItem);
+        return curItem;
+    }
+
+    private OrderItem matchOrderItem(List<OrderItem> items, Product product, OrderItem curItem) {
         for (OrderItem item : items) {
             if (item.getCode() == product.getCode()) {
                 curItem = item;
@@ -44,6 +54,11 @@ public class Receipt {
 
     private BigDecimal calculateSubtotal(List<Product> products, List<OrderItem> items) {
         BigDecimal subTotal = new BigDecimal(0);
+        subTotal = sumALLProducts(products, items, subTotal);
+        return subTotal;
+    }
+
+    private BigDecimal sumALLProducts(List<Product> products, List<OrderItem> items, BigDecimal subTotal) {
         for (Product product : products) {
             OrderItem item = findOrderItemByProduct(items, product);
             BigDecimal itemTotal = product.getPrice().multiply(new BigDecimal(item.getCount()));
